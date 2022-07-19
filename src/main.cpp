@@ -7,6 +7,8 @@ int main(int argc, char *argv[])
         printf("error_argc!\n");
         exit(-1);
     }
+
+    // Init class
     ping *myPing = new ping;
     myPing->init(0, 0, argv[1]);
 
@@ -14,6 +16,7 @@ int main(int argc, char *argv[])
     struct protoent *proto;
  
     unsigned long inaddr = 01;
+    // Buff size
     int size = 50*1024;
     if((proto = getprotobyname("icmp")) == NULL)
     {
@@ -33,13 +36,13 @@ int main(int argc, char *argv[])
     // Set Uid
     setuid(getuid());
 
-    // Set socket buff size
+    // Set socket option
     setsockopt(myPing->sockfd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size));
     bzero(&myPing->dest_addr, sizeof(myPing->dest_addr));
 
     myPing->dest_addr.sin_family = AF_INET;
 
-    // Input is Host or IPaddr?
+    // Input is domain name or IPaddr?
     if(inaddr = inet_addr(argv[1]) == INADDR_NONE)
     {
         if((host = gethostbyname(argv[1])) == NULL)
@@ -57,22 +60,21 @@ int main(int argc, char *argv[])
     myPing->pid = getpid();
     printf("PING %s: %d bytes data in ICMP packets.\n", argv[1], myPing->datalen);
 
+    // Loop to ping
     int loop = 0;
-   gettimeofday(&ping::begin, NULL);
+    // gettimeofday(&ping::begin, NULL);
 
     while(loop < MAX_NO_PACKETS)
     {
-        myPing->send_packet() == true ? ping::m_nsend++ : ping::m_nsend;
+        // It can always be sent successfully, but could not received successfully.
+        myPing->send_packet();
+        ++ping::m_nsend;
         myPing->recv_packet() == true ? ping::m_nreceived++ : ping::m_nreceived;
         ++loop;
         sleep(1);
     }
-    gettimeofday(&ping::end, NULL);
+    // gettimeofday(&ping::end, NULL);
 
-
-
-    myPing->send_packet();
-    myPing->recv_packet();
     myPing->statistics(SIGALRM);
     delete myPing;
     return 0;

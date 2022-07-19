@@ -34,7 +34,9 @@ public:
     void init(int nsend, int nreceived, char *ipAddr);
     static int sockfd;
     static int m_nsend, m_nreceived;
-    static struct timeval begin, end;
+    // static struct timeval begin, end;
+    
+    static double totalRtt;
     static char *m_Addr;
 
     pid_t pid;
